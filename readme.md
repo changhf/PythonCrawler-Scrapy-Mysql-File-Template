@@ -213,7 +213,7 @@ class JsonWithEncodingPipeline(object):
 
 ![创建testdb数据库和testtable表][1]
  - 测试爬虫
- 在D盘建立文件夹pics; 图片自动保存到该文件夹中。
+ 在桌面C:\Users\changhf\Desktop\建立文件夹pics; 图片自动保存到该文件夹中。
  `scrapy crawl webCrawler_scrapy`运行爬虫后会将爬取得图片保存到本地，并且将name和url保存到数据库中
 
 ![测试爬虫][2]    

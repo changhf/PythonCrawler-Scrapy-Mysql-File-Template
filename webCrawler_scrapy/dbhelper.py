@@ -1,118 +1,128 @@
-import MySQLdb
-from scrapy.utils.project import get_project_settings #µ¼ÈëseetingsÅäÖÃ
+import pymysql
+from scrapy.utils.project import get_project_settings  # å¯¼å…¥seetingsé…ç½®
+
 
 class DBHelper():
-    
-    '''Õâ¸öÀàÒ²ÊÇ¶ÁÈ¡settingsÖĞµÄÅäÖÃ£¬×ÔĞĞĞŞ¸Ä´úÂë½øĞĞ²Ù×÷'''
+    '''è¿™ä¸ªç±»ä¹Ÿæ˜¯è¯»å–settingsä¸­çš„é…ç½®ï¼Œè‡ªè¡Œä¿®æ”¹ä»£ç è¿›è¡Œæ“ä½œ'''
+
     def __init__(self):
-        self.settings=get_project_settings() #»ñÈ¡settingsÅäÖÃ£¬ÉèÖÃĞèÒªµÄĞÅÏ¢
-        
-        self.host=self.settings['MYSQL_HOST']
-        self.port=self.settings['MYSQL_PORT']
-        self.user=self.settings['MYSQL_USER']
-        self.passwd=self.settings['MYSQL_PASSWD']
-        self.db=self.settings['MYSQL_DBNAME']
-    
-    #Á¬½Óµ½mysql£¬²»ÊÇÁ¬½Óµ½¾ßÌåµÄÊı¾İ¿â
+        self.settings = get_project_settings()  # è·å–settingsé…ç½®ï¼Œè®¾ç½®éœ€è¦çš„ä¿¡æ¯
+
+        self.host = self.settings['MYSQL_HOST']
+        self.port = self.settings['MYSQL_PORT']
+        self.user = self.settings['MYSQL_USER']
+        self.passwd = self.settings['MYSQL_PASSWD']
+        self.db = self.settings['MYSQL_DBNAME']
+
+    # è¿æ¥åˆ°mysqlï¼Œä¸æ˜¯è¿æ¥åˆ°å…·ä½“çš„æ•°æ®åº“
     def connectMysql(self):
-        conn=MySQLdb.connect(host=self.host,
-                             port=self.port,
-                             user=self.user,
-                             passwd=self.passwd,
-                             #db=self.db,²»Ö¸¶¨Êı¾İ¿âÃû
-                             charset='utf8') #ÒªÖ¸¶¨±àÂë£¬·ñÔòÖĞÎÄ¿ÉÄÜÂÒÂë
+        conn = pymysql.connect(host=self.host,
+                               port=self.port,
+                               user=self.user,
+                               passwd=self.passwd,
+                               # db=self.db,ä¸æŒ‡å®šæ•°æ®åº“å
+                               charset='utf8')  # è¦æŒ‡å®šç¼–ç ï¼Œå¦åˆ™ä¸­æ–‡å¯èƒ½ä¹±ç 
         return conn
-    #Á¬½Óµ½¾ßÌåµÄÊı¾İ¿â£¨settingsÖĞÉèÖÃµÄMYSQL_DBNAME£©
+
+    # è¿æ¥åˆ°å…·ä½“çš„æ•°æ®åº“ï¼ˆsettingsä¸­è®¾ç½®çš„MYSQL_DBNAMEï¼‰
     def connectDatabase(self):
-        conn=MySQLdb.connect(host=self.host,
-                             port=self.port,
-                             user=self.user,
-                             passwd=self.passwd,
-                             db=self.db,
-                             charset='utf8') #ÒªÖ¸¶¨±àÂë£¬·ñÔòÖĞÎÄ¿ÉÄÜÂÒÂë
-        return conn   
-    
-    #´´½¨Êı¾İ¿â
+        conn = pymysql.connect(host=self.host,
+                               port=self.port,
+                               user=self.user,
+                               passwd=self.passwd,
+                               db=self.db,
+                               charset='utf8')  # è¦æŒ‡å®šç¼–ç ï¼Œå¦åˆ™ä¸­æ–‡å¯èƒ½ä¹±ç 
+        return conn
+
+        # åˆ›å»ºæ•°æ®åº“
+
     def createDatabase(self):
-        '''ÒòÎª´´½¨Êı¾İ¿âÖ±½ÓĞŞ¸ÄsettingsÖĞµÄÅäÖÃMYSQL_DBNAME¼´¿É£¬ËùÒÔ¾Í²»Òª´«sqlÓï¾äÁË'''
-        conn=self.connectMysql()#Á¬½ÓÊı¾İ¿â
-        
-        sql="create database if not exists "+self.db
-        cur=conn.cursor()
-        cur.execute(sql)#Ö´ĞĞsqlÓï¾ä
+        '''å› ä¸ºåˆ›å»ºæ•°æ®åº“ç›´æ¥ä¿®æ”¹settingsä¸­çš„é…ç½®MYSQL_DBNAMEå³å¯ï¼Œæ‰€ä»¥å°±ä¸è¦ä¼ sqlè¯­å¥äº†'''
+        conn = self.connectMysql()  # è¿æ¥æ•°æ®åº“
+
+        sql = "CREATE DATABASE IF NOT EXISTS " + self.db
+        cur = conn.cursor()
+        cur.execute(sql)  # æ‰§è¡Œsqlè¯­å¥
         cur.close()
         conn.close()
-    
-    #´´½¨±í
-    def createTable(self,sql):
-        conn=self.connectDatabase()
-        
-        cur=conn.cursor()
+
+    # åˆ›å»ºè¡¨
+    def createTable(self, sql):
+        conn = self.connectDatabase()
+
+        cur = conn.cursor()
         cur.execute(sql)
         cur.close()
         conn.close()
-    #²åÈëÊı¾İ
-    def insert(self,sql,*params):#×¢ÒâÕâÀïparamsÒª¼Ó*,ÒòÎª´«µİ¹ıÀ´µÄÊÇÔª×é£¬*±íÊ¾²ÎÊı¸öÊı²»¶¨
-        conn=self.connectDatabase()
-        
-        cur=conn.cursor();
-        cur.execute(sql,params)
-        conn.commit()#×¢ÒâÒªcommit
+
+    # æ’å…¥æ•°æ®
+    def insert(self, sql, *params):  # æ³¨æ„è¿™é‡Œparamsè¦åŠ *,å› ä¸ºä¼ é€’è¿‡æ¥çš„æ˜¯å…ƒç»„ï¼Œ*è¡¨ç¤ºå‚æ•°ä¸ªæ•°ä¸å®š
+        conn = self.connectDatabase()
+
+        cur = conn.cursor();
+        cur.execute(sql, params)
+        conn.commit()  # æ³¨æ„è¦commit
         cur.close()
         conn.close()
-    #¸üĞÂÊı¾İ
-    def update(self,sql,*params):
-        conn=self.connectDatabase()
-        
-        cur=conn.cursor()
-        cur.execute(sql,params)
-        conn.commit()#×¢ÒâÒªcommit
+
+    # æ›´æ–°æ•°æ®
+    def update(self, sql, *params):
+        conn = self.connectDatabase()
+
+        cur = conn.cursor()
+        cur.execute(sql, params)
+        conn.commit()  # æ³¨æ„è¦commit
         cur.close()
         conn.close()
-    
-    #É¾³ıÊı¾İ
-    def delete(self,sql,*params):
-        conn=self.connectDatabase()
-        
-        cur=conn.cursor()
-        cur.execute(sql,params)
+
+    # åˆ é™¤æ•°æ®
+    def delete(self, sql, *params):
+        conn = self.connectDatabase()
+
+        cur = conn.cursor()
+        cur.execute(sql, params)
         conn.commit()
         cur.close()
         conn.close()
-        
-        
 
-'''²âÊÔDBHelperµÄÀà'''
+
+'''æµ‹è¯•DBHelperçš„ç±»'''
+
+
 class TestDBHelper():
     def __init__(self):
-        self.dbHelper=DBHelper()
-               
-    #²âÊÔ´´½¨Êı¾İ¿â£¨settingsÅäÖÃÎÄ¼şÖĞµÄMYSQL_DBNAME,Ö±½ÓĞŞ¸ÄsettingsÅäÖÃÎÄ¼ş¼´¿É£©
+        self.dbHelper = DBHelper()
+
+    # æµ‹è¯•åˆ›å»ºæ•°æ®åº“ï¼ˆsettingsé…ç½®æ–‡ä»¶ä¸­çš„MYSQL_DBNAME,ç›´æ¥ä¿®æ”¹settingsé…ç½®æ–‡ä»¶å³å¯ï¼‰
     def testCreateDatebase(self):
-        self.dbHelper.createDatabase() 
-    #²âÊÔ´´½¨±í
+        self.dbHelper.createDatabase()
+        # æµ‹è¯•åˆ›å»ºè¡¨
+
     def testCreateTable(self):
-        sql="create table testtable(id int primary key auto_increment,name varchar(50),url varchar(200))"
+        sql = "CREATE TABLE testtable(id INT PRIMARY KEY AUTO_INCREMENT,name VARCHAR(50),url VARCHAR(200))"
         self.dbHelper.createTable(sql)
-    #²âÊÔ²åÈë
+
+    # æµ‹è¯•æ’å…¥
     def testInsert(self):
-        sql="insert into testtable(name,url) values(%s,%s)"
-        params=("test","test")
-        self.dbHelper.insert(sql,*params) #  *±íÊ¾²ğ·ÖÔª×é£¬µ÷ÓÃinsert£¨*params£©»áÖØ×é³ÉÔª×é
+        sql = "INSERT INTO testtable(name,url) VALUES(%s,%s)"
+        params = ("test", "test")
+        self.dbHelper.insert(sql, *params)  # *è¡¨ç¤ºæ‹†åˆ†å…ƒç»„ï¼Œè°ƒç”¨insertï¼ˆ*paramsï¼‰ä¼šé‡ç»„æˆå…ƒç»„
+
     def testUpdate(self):
-        sql="update testtable set name=%s,url=%s where id=%s"
-        params=("update","update","1")
-        self.dbHelper.update(sql,*params)
-    
+        sql = "UPDATE testtable SET name=%s,url=%s WHERE id=%s"
+        params = ("update", "update", "1")
+        self.dbHelper.update(sql, *params)
+
     def testDelete(self):
-        sql="delete from testtable where id=%s"
-        params=("1")
-        self.dbHelper.delete(sql,*params)
-    
-if __name__=="__main__":
-    testDBHelper=TestDBHelper()
-    #testDBHelper.testCreateDatebase()  #Ö´ĞĞ²âÊÔ´´½¨Êı¾İ¿â
-    #testDBHelper.testCreateTable()     #Ö´ĞĞ²âÊÔ´´½¨±í
-    #testDBHelper.testInsert()          #Ö´ĞĞ²âÊÔ²åÈëÊı¾İ
-    #testDBHelper.testUpdate()          #Ö´ĞĞ²âÊÔ¸üĞÂÊı¾İ
-    #testDBHelper.testDelete()          #Ö´ĞĞ²âÊÔÉ¾³ıÊı¾İ
+        sql = "DELETE FROM testtable WHERE id=%s"
+        params = ("1")
+        self.dbHelper.delete(sql, *params)
+
+
+if __name__ == "__main__":
+    testDBHelper = TestDBHelper()
+    # testDBHelper.testCreateDatebase()  #æ‰§è¡Œæµ‹è¯•åˆ›å»ºæ•°æ®åº“
+    # testDBHelper.testCreateTable()     #æ‰§è¡Œæµ‹è¯•åˆ›å»ºè¡¨
+    testDBHelper.testInsert()          #æ‰§è¡Œæµ‹è¯•æ’å…¥æ•°æ®
+    testDBHelper.testUpdate()          #æ‰§è¡Œæµ‹è¯•æ›´æ–°æ•°æ®
+    # testDBHelper.testDelete()          #æ‰§è¡Œæµ‹è¯•åˆ é™¤æ•°æ®
